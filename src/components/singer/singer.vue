@@ -1,5 +1,8 @@
 <template>
-  <div></div>
+  <div class="singer">
+    <list-view :data ="singers" @select="selectSinger"></list-view>
+    <router-view></router-view>
+  </div>
 </template>
 
 
@@ -7,6 +10,7 @@
 import { getSingerList } from "../../api/singer.js";
 import { ERR_OK } from "../../api/config.js";
 import Singer from "../../common/js/singer.js";
+import ListView from "../../base/listview/listview"
 const HOT_NAME = "热门";
 const HOT_SINGER_LEN = 10;
 
@@ -16,15 +20,23 @@ export default {
       singers: []
     };
   },
+  components:{
+      ListView
+  },
   created() {
     this._getSingerList();
   },
   methods: {
+    selectSinger(singer) {
+       this.$router.push({
+         path: `/singer/${singer.id}`
+       })
+    },
     _getSingerList() {
       getSingerList().then(res => {
         if (res.code == ERR_OK) {
-          this.singers = res.data.list;
-          console.info(this._normalizeSinger(this.singers));
+          this.singers =   this._normalizeSinger(res.data.list)
+         
         }
       });
     },
@@ -58,7 +70,24 @@ export default {
           })
         );
       });
-      console.info(map);
+      /* 为了得到有序列表 对map进行处理 */
+      let hot = [];
+      let ret = [];
+      for(let key in map){
+        let val = map[key]
+        if(val.title.match(/[a-zA-Z]/)){
+            ret.push(val)
+        }else if(val.title === HOT_NAME){
+            hot.push(val)
+        }
+      }
+      ret.sort((a, b) => {
+         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
+      })
+     
+       return hot.concat(ret) 
+
+
     }
   }
 };
