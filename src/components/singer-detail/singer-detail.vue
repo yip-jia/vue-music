@@ -41,10 +41,8 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code == ERR_OK) {
-         console.info(this.singer)
          processSongsUrl(this._normalizeSongs(res.data.list)).then((songs) => {
               this.songs = songs
-            
             })
         }
       });
@@ -68,6 +66,7 @@ export default {
 <style lang="stylus" scoped>
 
 @import '~@/common/stylus/variable';
+ @import "~@/common/stylus/mixin"
 
 .slide-enter-active, .slide-leave-active {
   transition: all 0.3s;
