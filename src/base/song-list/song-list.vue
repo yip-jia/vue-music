@@ -22,7 +22,6 @@ export default {
   methods: {
     selectItem(item, index) {
       this.$emit("select", item, index);
-      console.info(item);
     },
     getDesc(song) {
       return `${song.singer}。${song.album}`;
