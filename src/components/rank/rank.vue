@@ -46,7 +46,6 @@ export default {
             getTopList().then((res) => {
                if(res.code === ERR_OK) {
                    this.topList = res.data.topList
-                   console.info(this.topList)
                }
             })
         },
@@ -56,6 +55,7 @@ export default {
             this.$refs.toplist.refresh()
         },
         selectItem(item) {
+            console.info(item)
             this.$router.push({
                 path: `/rank/${item.id}`
             })

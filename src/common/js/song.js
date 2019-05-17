@@ -53,8 +53,9 @@ export function createSong(musicData) {
     url: musicData.url
   });
 }
+
 /* 让歌手名字以类似 周杰伦/袁咏琳  */
-function filterSinger(singer) {
+export function filterSinger(singer) {
   let ret = [];
   if (!singer) {
     return "";
