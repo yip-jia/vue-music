@@ -1,5 +1,5 @@
 <template>
-  <scroll class="suggest" :data="result" :pullup="pullup" @scrollToEnd="searchMore" ref="suggest">
+  <scroll class="suggest" :data="result" :pullup="pullup" :beforeScroll="beforeScroll" @scrollToEnd="searchMore" @beforeScroll="listScroll"   ref="suggest">
     <ul class="suggest-list">
       <li
         @click="selectItem(item)"
@@ -43,7 +43,8 @@ export default {
       page: 1,
       result: [],
       pullup: true,
-      hasMore: true
+      hasMore: true,
+      beforeScroll: true
     };
   },
   components: {
@@ -62,6 +63,9 @@ export default {
     }
   },
   methods: {
+    refresh() {
+      this.$refs.suggest.refresh()
+    },
     search() {
       this.page = 1;
       this.hasMore = true;
@@ -88,6 +92,9 @@ export default {
           this._checkMore(res.data);
         }
       });
+    },
+    listScroll() {
+       this.$emit('listScroll')
     },
     _checkMore(data) {
       const song = data.song;
@@ -148,6 +155,7 @@ export default {
       } else {
         this.insertSong(item);
       }
+      this.$emit('select')
     },
     ...mapMutations({
       setSinger: "SET_SINGER"

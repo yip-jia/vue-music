@@ -97,11 +97,12 @@
             <i @click.stop="togglePlaying" :class="miniIcon" class="icon-mini"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -126,6 +127,7 @@ import Lyric from "lyric-parser";
 import Scroll from "../../base/scroll/scroll";
 import { transcode } from "buffer";
 import { setTimeout } from 'timers';
+import Playlist from "../playlist/playlist"
 
 const transform = prefixStyle("transform");
 const transitionDuration = prefixStyle("transitionDuration");
@@ -144,7 +146,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    Playlist
   },
   computed: {
     cdCls() {
@@ -183,6 +186,9 @@ export default {
     this.touch = {};
   },
   methods: {
+    showPlaylist() {
+      this.$refs.playlist.show()
+    },
     back() {
       this.setFullScreen(false);
     },
