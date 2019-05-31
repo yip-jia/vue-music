@@ -51,13 +51,13 @@ import { getHotKey } from "../../api/search.js";
 import { ERR_OK } from "../../api/config.js";
 import { mapActions, mapGetters } from "vuex";
 import { setTimeout } from 'timers';
-import { playlistMixin} from  "../../common/js/mixin.js"
+import { playlistMixin, searchMixins} from  "../../common/js/mixin.js"
 export default {
-  mixins:[ playlistMixin],
+  mixins:[ playlistMixin, searchMixins],
   data() {
     return {
       hotKey: [],
-      query: ""
+     
     };
   },
   components: {
@@ -74,7 +74,7 @@ export default {
      shortcut() {
         return this.hotKey.concat(this.searchHistory)
      },
-    ...mapGetters(["searchHistory"])
+   
   },
   methods: {
      handlePlaylist(playlist) {
@@ -91,24 +91,12 @@ export default {
         }
       });
     },
-    addQuery(query) {
-      this.$refs.searchBox.setQuery(query);
-    },
-    onQueryChange(query) {
-      this.query = query;
-    },
-    blurInput() {
-      this.$refs.searchBox.blur();
-    },
-    saveSearch() {
-      this.saveSearchHistory(this.query);
-    },
+
+    
     showConfirm() {
       this.$refs.confirm.show();
     },
     ...mapActions([
-      "saveSearchHistory",
-      "deleteSearchHistory",
       "clearSearchHistory"
     ])
   },
