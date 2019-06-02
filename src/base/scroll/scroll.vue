@@ -32,6 +32,10 @@ export default {
     beforeScroll: {
       type: Boolean,
       default: false
+    },
+    refreshDelay: {
+      type: Number,
+      default: 20
     }
   },
   mounted() {
@@ -48,52 +52,50 @@ export default {
       this.scroll = new BScroll(this.$refs.wrapper, {
         probeType: this.probeType,
         click: this.click
-      })
+      });
       // 是否派发滚动事件
-      if(this.listenScroll) {
-        let me = this
-        this.scroll.on('scroll', (pos) => {
-          me.$emit('scroll',pos)
-        })
+      if (this.listenScroll) {
+        let me = this;
+        this.scroll.on("scroll", pos => {
+          me.$emit("scroll", pos);
+        });
       }
       //是否派发滚动到底部事件，用于上拉加载
       if (this.pullup) {
-          this.scroll.on('scrollEnd', () => {
-            // 滚动到底部
-            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
-              this.$emit('scrollToEnd')
-            }
-          })
+        this.scroll.on("scrollEnd", () => {
+          // 滚动到底部
+          if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+            this.$emit("scrollToEnd");
+          }
+        });
       }
-      if(this.beforeScroll) {
-          this.scroll.on('beforeScrollStart', () => {
-            this.$emit('beforeScroll')
-          })
+      if (this.beforeScroll) {
+        this.scroll.on("beforeScrollStart", () => {
+          this.$emit("beforeScroll");
+        });
       }
-
-
     },
     enable() {
-        this.scroll && this.scroll.enable()
+      this.scroll && this.scroll.enable();
     },
     disable() {
-        this.scroll && this.scroll.disable()
+      this.scroll && this.scroll.disable();
     },
     refresh() {
       this.scroll && this.scroll.refresh();
     },
     scrollTo() {
-      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)   
-  },
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments);
+    },
     scrollToElement() {
-      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments);
     }
   },
   watch: {
     data() {
       setTimeout(() => {
         this.refresh();
-      }, 20);
+      }, this.refreshDelay);
     }
   }
 };

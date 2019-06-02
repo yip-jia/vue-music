@@ -1,64 +1,67 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Rank from './components/rank/rank.vue'
-import Recommend from './components/recommend/recommend'
-import Search from './components/search/search'
-import Singer from './components/singer/singer'
-import SingerDetail from './components/singer-detail/singer-detail'
-import Disc from './components/disc/disc'
-import TopList from './components/top-list/top-list.vue'
+import Vue from "vue";
+import Router from "vue-router";
+import Rank from "./components/rank/rank.vue";
+import Recommend from "./components/recommend/recommend";
+import Search from "./components/search/search";
+import Singer from "./components/singer/singer";
+import SingerDetail from "./components/singer-detail/singer-detail";
+import Disc from "./components/disc/disc";
+import TopList from "./components/top-list/top-list.vue";
+import UserCenter from "./components/user-center/user-center.vue";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
-      redirect: '/recommend'
+      path: "/",
+      redirect: "/recommend"
     },
     {
-      path: '/rank',
+      path: "/rank",
       component: Rank,
-      children:[
+      children: [
         {
-          path: ':id',
+          path: ":id",
           component: TopList
         }
       ]
     },
     {
-      path: '/recommend',
+      path: "/recommend",
       component: Recommend,
-      children:[
+      children: [
         {
-          path: ':id',
+          path: ":id",
           component: Disc
         }
       ]
     },
     {
-      path: '/search',
+      path: "/search",
       component: Search,
-      children:[
+      children: [
         {
-          path: ':id',
+          path: ":id",
           component: SingerDetail
         }
       ]
     },
     {
-      path: '/singer',
+      path: "/singer",
       component: Singer,
       children: [
         {
-          path: ':id',
+          path: ":id",
           component: SingerDetail
         }
       ]
+    },
+    {
+      path: "/user",
+      component: UserCenter
     }
-
-
   ]
-})
+});

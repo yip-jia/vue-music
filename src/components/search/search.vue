@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
-      <scroll class="shortcut" :data="shortcut" ref="shortcut">
+      <scroll :refreshDelay="refreshDelay" class="shortcut" :data="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -50,14 +50,13 @@ import Scroll from "../../base/scroll/scroll";
 import { getHotKey } from "../../api/search.js";
 import { ERR_OK } from "../../api/config.js";
 import { mapActions, mapGetters } from "vuex";
-import { setTimeout } from 'timers';
-import { playlistMixin, searchMixins} from  "../../common/js/mixin.js"
+import { setTimeout } from "timers";
+import { playlistMixin, searchMixins } from "../../common/js/mixin.js";
 export default {
-  mixins:[ playlistMixin, searchMixins],
+  mixins: [playlistMixin, searchMixins],
   data() {
     return {
-      hotKey: [],
-     
+      hotKey: []
     };
   },
   components: {
@@ -71,19 +70,18 @@ export default {
     this._getHotKey();
   },
   computed: {
-     shortcut() {
-        return this.hotKey.concat(this.searchHistory)
-     },
-   
+    shortcut() {
+      return this.hotKey.concat(this.searchHistory);
+    }
   },
   methods: {
-     handlePlaylist(playlist) {
-         const bottom = playlist.length >0 ? '60px' : ''
-         this.$refs.shortcutWrapper.style.bottom = bottom
-         this.$refs.shortcut.refresh()
-         this.$refs.searchResult.style.bottom = bottom
-         this.$refs.suggest.refresh()
-     },
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? "60px" : "";
+      this.$refs.shortcutWrapper.style.bottom = bottom;
+      this.$refs.shortcut.refresh();
+      this.$refs.searchResult.style.bottom = bottom;
+      this.$refs.suggest.refresh();
+    },
     _getHotKey() {
       getHotKey().then(res => {
         if (res.code === ERR_OK) {
@@ -92,22 +90,19 @@ export default {
       });
     },
 
-    
     showConfirm() {
       this.$refs.confirm.show();
     },
-    ...mapActions([
-      "clearSearchHistory"
-    ])
+    ...mapActions(["clearSearchHistory"])
   },
   watch: {
-       query(newQuery) {
-            if(!newQuery) {
-                 setTimeout(() => {
-                     this.$refs.shortcut.refresh()  
-                 }, 20)
-            }
-       }
+    query(newQuery) {
+      if (!newQuery) {
+        setTimeout(() => {
+          this.$refs.shortcut.refresh();
+        }, 20);
+      }
+    }
   }
 };
 </script>

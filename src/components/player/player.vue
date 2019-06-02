@@ -74,7 +74,7 @@
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon icon-not-favorite"></i>
+              <i class="icon icon-not-favorite" @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -106,10 +106,11 @@
     <audio
       ref="audio"
       :src="currentSong.url"
-      @canplay="ready"
+      @playing="ready"
       @error="error"
       @timeupdate="updateTime"
       @ended="end"
+      @pause="paused"
     ></audio>
   </div>
 </template>
@@ -125,14 +126,14 @@ import { playMode } from "../../common/js/config.js";
 import Lyric from "lyric-parser";
 import Scroll from "../../base/scroll/scroll";
 import { transcode } from "buffer";
-import { setTimeout } from 'timers';
-import Playlist from "../playlist/playlist"
-import {playerMixin} from "../../common/js/mixin.js"
+import { setTimeout } from "timers";
+import Playlist from "../playlist/playlist";
+import { playerMixin } from "../../common/js/mixin.js";
 
 const transform = prefixStyle("transform");
 const transitionDuration = prefixStyle("transitionDuration");
 export default {
-  mixins:[playerMixin],
+  mixins: [playerMixin],
   data() {
     return {
       songReady: false,
@@ -166,19 +167,15 @@ export default {
     percent() {
       return this.currentTime / this.currentSong.duration;
     },
-   
-    ...mapGetters([
-      "fullScreen",
-      "playing",
-      "currentIndex",
-    ])
+
+    ...mapGetters(["fullScreen", "playing", "currentIndex"])
   },
   created() {
     this.touch = {};
   },
   methods: {
     showPlaylist() {
-      this.$refs.playlist.show()
+      this.$refs.playlist.show();
     },
     back() {
       this.setFullScreen(false);
@@ -264,7 +261,7 @@ export default {
       } else {
         let index = this.currentIndex - 1;
         if (index === -1) {
-         index = this.playlist.length - 1
+          index = this.playlist.length - 1;
         }
         this.setCurrentIndex(index);
         if (!this.playing) {
@@ -274,7 +271,13 @@ export default {
     },
     ready() {
       this.songReady = true;
-      this.savePlayHistory(this.currentSong)
+      this.savePlayHistory(this.currentSong);
+    },
+    paused() {
+      this.setPlayingState(false);
+      if (this.currentLyric) {
+        this.currentLyric.stop();
+      }
     },
     end() {
       if (this.mode === playMode.loop) {
@@ -320,7 +323,7 @@ export default {
       }
       return num;
     },
-   
+
     getLyric() {
       this.currentSong
         .getLyric()
@@ -349,7 +352,7 @@ export default {
     middleTouchStart(e) {
       this.touch.initiated = true;
       // 用来判断是否是一次移动
-        this.touch.moved = false
+      this.touch.moved = false;
       const touch = e.touches[0];
       this.touch.startX = touch.pageX;
       this.touch.startY = touch.pageY;
@@ -365,8 +368,8 @@ export default {
         return;
       }
       if (!this.touch.moved) {
-          this.touch.moved = true
-        }
+        this.touch.moved = true;
+      }
 
       const left = this.currentShow === "cd" ? 0 : -window.innerWidth;
       const offsetWidth = Math.min(
@@ -382,8 +385,8 @@ export default {
     },
     middleTouchEnd(e) {
       if (!this.touch.moved) {
-          return
-        }
+        return;
+      }
       let offsetWidth;
       let opacity;
       if (this.currentShow === "cd") {
@@ -430,11 +433,9 @@ export default {
       };
     },
     ...mapMutations({
-      setFullScreen: "SET_FULL_SCREEN",
+      setFullScreen: "SET_FULL_SCREEN"
     }),
-    ...mapActions([
-       'savePlayHistory'
-    ]),
+    ...mapActions(["savePlayHistory"]),
 
     /* 用于暂停时计算cd的旋转样式 */
     syncWrapperTransform(wrapper, inner) {
@@ -452,9 +453,9 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
-        if(!newSong.id) {
-         return
-       } 
+      if (!newSong.id) {
+        return;
+      }
       if (newSong.id === oldSong.id) {
         return;
       }
@@ -473,6 +474,9 @@ export default {
     },
     /* 播放暂停 */
     playing(newPlaying) {
+      if (!this.songReady) {
+        return;
+      }
       const audio = this.$refs.audio;
       this.$nextTick(() => {
         newPlaying ? audio.play() : audio.pause();
