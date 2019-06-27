@@ -31,7 +31,7 @@
               </div>
             </div>
             <div class="playing-lyric-wrapper">
-              <div class="playing-lyric">{{platingLyric}}</div>
+              <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
@@ -74,7 +74,11 @@
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon icon-not-favorite" @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
+              <i
+                class="icon icon-not-favorite"
+                @click="toggleFavorite(currentSong)"
+                :class="getFavoriteIcon(currentSong)"
+              ></i>
             </div>
           </div>
         </div>
@@ -126,7 +130,7 @@ import { playMode } from "../../common/js/config.js";
 import Lyric from "lyric-parser";
 import Scroll from "../../base/scroll/scroll";
 import { transcode } from "buffer";
-import { setTimeout } from "timers";
+import { setTimeout, clearTimeout } from "timers";
 import Playlist from "../playlist/playlist";
 import { playerMixin } from "../../common/js/mixin.js";
 
@@ -136,13 +140,15 @@ export default {
   mixins: [playerMixin],
   data() {
     return {
-      songReady: false,
-      currentTime: 0,
-      radius: 32,
-      currentLyric: null,
-      currentLineNum: 0,
-      currentShow: "cd",
-      platingLyric: null
+        songReady: false,
+        currentTime: 0,
+        radius: 32,
+        currentLyric: null,
+        currentLineNum: 0,
+        currentShow: 'cd',
+        playingLyric: '',
+        isPureMusic: false,
+        pureMusicLyric: ''
     };
   },
   components: {
@@ -241,6 +247,7 @@ export default {
       }
       if (this.playlist.length === 1) {
         this.loop();
+        return
       } else {
         let index = this.currentIndex + 1;
         if (index === this.playlist.length) {
@@ -258,6 +265,7 @@ export default {
       }
       if (this.playlist.length === 1) {
         this.loop();
+        return
       } else {
         let index = this.currentIndex - 1;
         if (index === -1) {
@@ -280,6 +288,7 @@ export default {
       }
     },
     end() {
+      this.currentTime = 0
       if (this.mode === playMode.loop) {
         this.loop();
       } else {
@@ -328,6 +337,9 @@ export default {
       this.currentSong
         .getLyric()
         .then(lyric => {
+          if(this.currentSong.lyric !== lyric) {
+            return
+          }
           this.currentLyric = new Lyric(lyric, this.handleLyric);
           if (this.playing) {
             this.currentLyric.play();
@@ -347,7 +359,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000);
       }
-      this.platingLyric = txt;
+      this.playingLyric = txt;
     },
     middleTouchStart(e) {
       this.touch.initiated = true;
@@ -467,7 +479,8 @@ export default {
         this.playingLyric = "";
         this.currentLineNum = 0;
       }
-      setTimeout(() => {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
         this.$refs.audio.play();
         this.getLyric();
       }, 1000);

@@ -3,11 +3,11 @@ import { commonParam } from './config'
 import { getUid } from '../common/js/uid'
 import axios from 'axios'
 import { ERR_OK } from './config'
-
+const debug = process.env.NODE_ENV !== 'production'
 /* 获取歌词 */
 
 export function getLyric(mid) {
-   const url= '/api/lyric'
+  const url = debug ? '/api/lyric' : '//47.92.243.233:8088/api/getDiscList'
    const data = Object.assign({}, commonParam, {
     songmid: mid,
     platform: 'yqq',
@@ -29,7 +29,7 @@ export function getLyric(mid) {
 
 
 export function getSongsUrl (songs) {
-    const url = '/api/getPurlUrl' 
+  const url = debug ? '/api/getPurlUrl' : '//47.92.243.233:8088/api/getDiscList'
     let mids = []
     let types = []
   
